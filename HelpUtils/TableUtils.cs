@@ -89,12 +89,12 @@ namespace TableUtils
 
     }
 
-    
+
     /// <summary>
     ///  Класс FillTable
     ///  позволяет заполнять таблицы случайными данными
     /// </summary>
-    public class FillTable: IDisposable
+    public class FillTable : IDisposable
     {
         private OperationWithDB db = new OperationWithDB();
         private static int numOfRowsInAbonents = 0;
@@ -103,9 +103,10 @@ namespace TableUtils
         ///  Метод для очистки всех таблиц
         /// </summary>
         private void clearAllTables()
-        {      
+        {
             db.clearTable("abonents");
             db.clearTable("electricitysupplyref");
+            db.clearTable("abonentshistory");
         }
 
         /// <summary>
@@ -116,7 +117,7 @@ namespace TableUtils
         {
             for (int i = 0; i < numberOfLines; i++)
             {
-                db.doSqlQuery("INSERT INTO electricitysupplyref VALUES (" + i + ", 'description_for_electricitysupply"+i+"',"+i+");");
+                db.doSqlQuery("INSERT INTO electricitysupplyref VALUES (" + i + ", 'description_for_electricitysupply" + i + "'," + i + ");");
             }
         }
 
@@ -130,9 +131,20 @@ namespace TableUtils
             numOfRowsInAbonents = rand.Next(50);
             for (int i = 0; i < numOfRowsInAbonents; i++)
             {
-                db.doSqlQuery("INSERT INTO abonents VALUES (" + i + ", 'description'," + rand.Next(1,4) + "," + rand.Next(1,4) + "," + rand.Next(1,4) + "," + rand.Next(1,4) + "," + rand.Next(1,4) + ",'" + DateTime.Now + "','mode'," + rand.Next(1,4) + "," + rand.Next(1,4) + ")");
+                db.doSqlQuery("INSERT INTO abonents VALUES (" + i + ", 'description'," + rand.Next(1, 4) + "," + rand.Next(1, 4) + "," + rand.Next(1, 4) + "," + rand.Next(1, 4) + "," + rand.Next(1, 4) + ",'" + DateTime.Now + "','mode'," + rand.Next(1, 4) + "," + rand.Next(1, 4) + ");");
             }
         }
+
+        private void fillAbonentsHistory()
+        {
+            Random rand = new Random();
+            for (int i = 0; i < numOfRowsInAbonents; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                    db.doSqlQuery("INSERT INTO abonentshistory VALUES (" + i + ",'" + DateTime.Now.AddDays(-j) + "'," + rand.Next(1, 500) + ");");
+            }
+        }
+
 
         /// <summary>
         ///  Метод для заполнения всех таблиц
@@ -142,6 +154,7 @@ namespace TableUtils
             clearAllTables();
             fillElectricitysupplyref(5);
             fillAbonents();
+            fillAbonentsHistory();
         }
 
         public void changeValuesInDb()
@@ -158,21 +171,21 @@ namespace TableUtils
                 Random rand = new Random();
                 for (int i = 0; i < numOfRowsInAbonents; i++)
                 {
-                    db.doSqlQuery("UPDATE abonents SET levelaccess=" + rand.Next(1, 4) + ",number_trading_floor=" + rand.Next(1, 4) + ",number_sector=" + rand.Next(1, 4) + ",number_module=" + rand.Next(1, 4) + ",id_group_electricity_supply=" + rand.Next(1, 4) + ",amount_electricity_consumed=" + rand.Next(1, 4) + ",power_consumption=" + rand.Next(1, 4) + "where id="+i.ToString()+";");
+                    db.doSqlQuery("UPDATE abonents SET levelaccess=" + rand.Next(1, 4) + ",number_trading_floor=" + rand.Next(1, 4) + ",number_sector=" + rand.Next(1, 4) + ",number_module=" + rand.Next(1, 4) + ",id_group_electricity_supply=" + rand.Next(1, 4) + ",amount_electricity_consumed=" + rand.Next(1, 4) + ",power_consumption=" + rand.Next(1, 4) + "where id=" + i.ToString() + ";");
                 }
             }
         }
 
-       /* static void Main(string[] args)
-        {
-            using (FillTable f = new FillTable())
-            {
-                f.fillAllTables();
-            }
-        }
-        */
+        /* static void Main(string[] args)
+         {
+             using (FillTable f = new FillTable())
+             {
+                 f.fillAllTables();
+             }
+         }
+         */
 
-        
+
 
         public void Dispose()
         {
